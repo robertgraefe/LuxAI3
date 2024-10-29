@@ -1,7 +1,12 @@
 from lux.utils import direction_to
 import sys
 import numpy as np
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(filename='myapp.log', level=logging.INFO)
+
 class Agent():
+
     def __init__(self, player: str, env_cfg) -> None:
         self.player = player
         self.opp_player = "player_1" if self.player == "player_0" else "player_0"
@@ -33,7 +38,8 @@ class Agent():
         
         actions = np.zeros((self.env_cfg["max_units"], 3), dtype=int)
 
-
+        logger.info(actions)
+        return actions
         # basic strategy here is simply to have some units randomly explore and some units collecting as much energy as possible
         # and once a relic node is found, we send all units to move randomly around the first relic node to gain points
         # and information about where relic nodes are found are saved for the next match
@@ -66,4 +72,5 @@ class Agent():
                     rand_loc = (np.random.randint(0, self.env_cfg["map_width"]), np.random.randint(0, self.env_cfg["map_height"]))
                     self.unit_explore_locations[unit_id] = rand_loc
                 actions[unit_id] = [direction_to(unit_pos, self.unit_explore_locations[unit_id]), 0, 0]
+        logger.info(actions)
         return actions
