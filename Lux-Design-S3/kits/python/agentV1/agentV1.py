@@ -8,6 +8,8 @@ logger.add("game.log", enqueue=False, mode="w", format="{message}")
 
 
 # cd C:\Users\rober\Documents\Workspace\LuxAI3\Lux-Design-S3\kits\python
+# cd ~/Dokumente/LuxAI3/Lux-Design-S3/kits/python/agentV1
+
 # luxai-s3 main.py main.py --output replay.json
 
 class Agent:
