@@ -10,6 +10,11 @@ logger.add("game.log", enqueue=False, mode="w", format="{message}")
 # cd C:\Users\rober\Documents\Workspace\LuxAI3\Lux-Design-S3\kits\python
 # luxai-s3 main.py main.py --output replay.json
 
+# conda activate LuxAI
+# cd C:\Users\rober\Documents\Workspace\LuxAI3\Lux-Design-S3\kits\python\agentV2
+# cd /home/robert/PycharmProjects/LuxAI3/Lux-Design-S3/kits/python
+# luxai-s3 agentV1/main.py agentV2/main.py --output replay.json
+
 class Agent:
     last_observation: Observation = None
 
