@@ -1,0 +1,24 @@
+.wrapper{
+    display: grid;
+    margin: 50px;
+    margin-left: 200px;
+    margin-right: 200px;
+}
+
+.chart{
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    margin: auto;
+    height: 150%;
+    width: 100%;
+}
+
+.video{
+    margin: auto;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    grid-column-start: 2;
+    grid-column-end: 3;
+}

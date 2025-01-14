@@ -1,0 +1,17 @@
+<div class="video-wrapper">
+    <div class="video-select">
+      <mat-form-field>
+          <mat-label>Videos</mat-label>
+          <mat-select [(value)]="selected" (selectionChange)="selectionChange($event)">
+            @for (video of videos; track video) {
+              <mat-option [value]="video">{{video}}</mat-option>
+            }
+          </mat-select>
+      </mat-form-field>
+    </div>
+    <div class="video">
+      <video muted autoplay controls #video>
+          <source [src]="selected" type="video/mp4" />
+      </video>
+    </div>
+</div>
