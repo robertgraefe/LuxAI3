@@ -3,8 +3,11 @@ from luxai_s3.state import EnvObs, EnvState
 from luxai_s3.wrappers import LuxAIS3GymEnv, RecordEpisode
 from typing import TypedDict, Any
 from agentV1 import Agent
+from LuxEnvPath import LuxEnvPath
 
-env = LuxAIS3GymEnv()
+#env = LuxAIS3GymEnv()
+
+env = LuxEnvPath()
 env = RecordEpisode(env)
 
 
@@ -33,7 +36,7 @@ while not done and not truncation:
         done = True
         truncation = True
 
-
     step += 1
+
 env.save_episode("test.json")
 #env.close()
