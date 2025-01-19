@@ -23,12 +23,14 @@ episode_reward = 0
 agent_0 = Agent("player_0", info["params"])
 agent_1 = Agent("player_1", info["params"])
 step = 0
+
 while not done and not truncation:
     actions = dict()
     actions[agent_0.player] = agent_0.act(step, observation["player_0"])
     actions[agent_1.player] = agent_1.act(step, observation["player_1"])
 
     observation, reward, terminated, truncated, info = env.step(actions)
+    print(reward)
     terminated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
     truncated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
 
