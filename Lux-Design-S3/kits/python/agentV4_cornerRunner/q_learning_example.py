@@ -1,8 +1,8 @@
 import numpy
 import matplotlib.pyplot as plt
 import matplotlib as mpl
-
-
+import pandas
+from absl.logging import level_warning
 
 steps = numpy.arange(stop = 1000)
 actions = ["north", "east", "south", "west"]
@@ -75,5 +75,32 @@ def intention_drift_north():
 # display_path(intention_drift_east())
 # display_path(intention_drift_north())
 
+def manhattan_distance(point1, point2):
+    return sum(abs(x-y) for x, y in zip(point1, point2))
 
+def policy_towards_home(position):
+    distances = [manhattan_distance(point1=home, point2=move(action, position)) for action in actions]
+    action = actions[numpy.argmin(distances)]
+    return action
 
+def reward_towards_home(position):
+    action = policy_towards_home(position)
+    distance = manhattan_distance(point1=home, point2=move(action, position))
+    return -distance
+
+def subsequent_position(position):
+    action = policy_towards_home(position)
+    subsequent_position = move(action, position)
+    return subsequent_position
+
+Q = 0
+position = [0, 0]
+learning_factor = .1
+discount_factor = .5
+path = [[0,0]]
+for step in steps:
+    Q = (1-learning_factor) * Q + learning_factor * (reward_towards_home(position) + discount_factor * Q)
+    position = subsequent_position(position)
+    path.append(position.copy())
+
+# display_path(path)
