@@ -230,6 +230,7 @@ for i_episode in range(num_episodes):
             plot_durations()
             break
 
+display(env)
 print('Complete')
 plot_durations(show_result=True)
 plt.ioff()
