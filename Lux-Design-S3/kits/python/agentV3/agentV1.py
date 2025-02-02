@@ -29,8 +29,8 @@ class Agent:
 
         actions = np.zeros((self.env_cfg.max_units, 3), dtype=int)
 
-        if self.team_id == 1:
-            return actions
+        #if self.team_id == 1:
+            #return actions
 
         observation = Observation(self.team_id, self.opponent_team_id, obs, actions, self.last_observation)
 
