@@ -27,31 +27,18 @@ while not done and not truncation:
 
     observation, _, terminated, truncated, info = env.step(actions)
 
-    if obs_0.player.units:
+    #if state is not None and action is not None:
+        #agent_1.buffer.push(state, action, next_state, reward)
 
-        for unit in obs_0.player.units.values():
-            reward_map = anticipate_reward()
-            x = unit.position[0]
-            y = unit.position[1]
-            reward_center = reward_map[x, y]
-            reward_up = reward_map[x, y - 1] if y - 1 >= 0 else -np.inf
-            reward_right = reward_map[x + 1, y] if x + 1 <= 23 else -np.inf
-            reward_down = reward_map[x, y + 1] if y + 1 <= 23 else -np.inf
-            reward_left = reward_map[x - 1, y] if x - 1 >= 0 else -np.inf
-            next_state = torch.as_tensor([reward_center, reward_up, reward_right, reward_down, reward_left])
+    agent_1.optimize_model()
 
-            if state is not None and action is not None:
-                agent_1.buffer.push(state, action, next_state, reward)
+    agent_1.soft_update()
 
-            optimize_model()
+    terminated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
+    truncated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
 
-            agent_1.soft_update()
-
-            terminated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
-            truncated: TypedDict("Terminated", {"player_0": jax.Array, "player_1": jax.Array})
-
-            if terminated["player_0"].item() or terminated["player_1"].item() or truncated["player_0"].item() or truncated["player_1"].item():
-                done = True
-                truncation = True
+    if terminated["player_0"].item() or terminated["player_1"].item() or truncated["player_0"].item() or truncated["player_1"].item():
+        done = True
+        truncation = True
 
 env.save_episode("test.json")
