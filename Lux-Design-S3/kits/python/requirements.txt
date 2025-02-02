@@ -9,8 +9,8 @@ Farama-Notifications==0.0.4
 filelock==3.16.1
 flax==0.10.2
 fonttools==4.55.3
-fsspec @ file:///croot/fsspec_1736274672181/work
-gmpy2 @ file:///work/ci_py311/gmpy2_1676839849213/work
+# fsspec @ file:///croot/fsspec_1736274672181/work
+# gmpy2 @ file:///work/ci_py311/gmpy2_1676839849213/work
 gym==0.26.2
 gym-notices==0.0.8
 gymnasium==1.0.0
@@ -21,24 +21,24 @@ jax==0.5.0
 jax-cuda12-pjrt==0.5.0
 jax-cuda12-plugin==0.5.0
 jaxlib==0.5.0
-Jinja2 @ file:///croot/jinja2_1730902924303/work
+# Jinja2 @ file:///croot/jinja2_1730902924303/work
 kiwisolver==1.4.8
 loguru==0.7.3
 # Editable install with no version control (luxai-s3==0.1.1)
--e /home/robert/PycharmProjects/Lux-Design-S3-main/src
+# -e /home/robert/PycharmProjects/Lux-Design-S3-main/src
 markdown-it-py==3.0.0
-MarkupSafe @ file:///croot/markupsafe_1736366905094/work
+# MarkupSafe @ file:///croot/markupsafe_1736366905094/work
 matplotlib==3.10.0
 mdurl==0.1.2
 mkl-service==2.4.0
-mkl_fft @ file:///io/mkl313/mkl_fft_1730824109137/work
-mkl_random @ file:///io/mkl313/mkl_random_1730823916628/work
+# mkl_fft @ file:///io/mkl313/mkl_fft_1730824109137/work
+# mkl_random @ file:///io/mkl313/mkl_random_1730823916628/work
 ml_dtypes==0.5.0
-mpmath @ file:///croot/mpmath_1690848262763/work
+# mpmath @ file:///croot/mpmath_1690848262763/work
 msgpack==1.1.0
 nest-asyncio==1.6.0
-networkx @ file:///croot/networkx_1737039604450/work
-numpy @ file:///croot/numpy_and_numpy_base_1725470312869/work/dist/numpy-2.0.1-cp311-cp311-linux_x86_64.whl#sha256=372b9067cf9c96d8662c6f20ef49eeda43f0f8d2f074820224c954d8d8fae7bc
+# networkx @ file:///croot/networkx_1737039604450/work
+# numpy @ file:///croot/numpy_and_numpy_base_1725470312869/work/dist/numpy-2.0.1-cp311-cp311-linux_x86_64.whl#sha256=372b9067cf9c96d8662c6f20ef49eeda43f0f8d2f074820224c954d8d8fae7bc
 nvidia-cublas-cu12==12.4.5.8
 nvidia-cuda-cupti-cu12==12.4.127
 nvidia-cuda-nvcc-cu12==12.6.85
@@ -74,10 +74,10 @@ six==1.17.0
 sympy==1.13.1
 tensorstore==0.1.71
 toolz==1.0.0
-torch @ file:///opt/conda/envs/bld/conda-bld/pytorch-select_1731532454354/work
+# torch @ file:///opt/conda/envs/bld/conda-bld/pytorch-select_1731532454354/work
 triton==3.1.0
 typeguard==4.4.1
-typing_extensions @ file:///croot/typing_extensions_1734714854207/work
+# typing_extensions @ file:///croot/typing_extensions_1734714854207/work
 tyro==0.9.5
 tzdata==2024.2
 zipp==3.21.0

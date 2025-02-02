@@ -19,8 +19,7 @@ device = torch.device(
     "cpu"
 )
 
-Transition = namedtuple('Transition',
-                        ('state', 'action', 'next_state', 'reward'))
+Transition = namedtuple(typename = 'Transition', field_names = ('state', 'action', 'next_state', 'reward'))
 
 
 class ReplayMemory(object):
@@ -37,6 +36,7 @@ class ReplayMemory(object):
 
     def __len__(self):
         return len(self.memory)
+
 
 class DQN(nn.Module):
 
@@ -68,6 +68,7 @@ EPS_END = 0.05
 EPS_DECAY = 1000
 TAU = 0.005
 LR = 1e-4
+
 
 # Get number of actions from gym action space
 n_actions = env.action_space.n
