@@ -1,12 +1,16 @@
+import numpy as np
 import torch.nn.functional as functional
 import math
 
 from luxai_s3.state import EnvObs
 from torch import nn, Tensor, optim
+from torchrl.data import ReplayBuffer, LazyTensorStorage, ListStorage
 import torch
+
 # custom
 from ReplayBuffer import ReplayMemory
-from environment import EnvironmentConfig
+from environment import EnvironmentConfig, Observation, TILETYPE
+from actions import DIRECTION
 
 class DQN(nn.Module):
 
@@ -30,13 +34,14 @@ class Agent:
         self.target_net = DQN(5, 5)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.optimizer = optim.AdamW(self.policy_net.parameters(), lr=1e-4, amsgrad=True)
-        self.buffer = ReplayMemory(10000)
+        self.buffer = ReplayBuffer(storage=ListStorage(10000), batch_size=128)
 
         self.env_cfg = EnvironmentConfig(**env_cfg)
         self.player = player
         self.opponent = "player_1" if self.player == "player_0" else "player_0"
         self.team_id = 0 if self.player == "player_0" else 1
         self.opponent_team_id = 1 if self.team_id == 0 else 0
+        self.observation: Observation
 
     def soft_update(self):
         # Soft update of the target network's weights
@@ -48,30 +53,51 @@ class Agent:
                     1 - 0.005)
         self.target_net.load_state_dict(target_net_state_dict)
 
-    def act(self, step, state: EnvObs):
+    def act(self, step, initialObservation: EnvObs) -> dict[int, list]:
 
-        sample = torch.rand([1])
+        actions = dict()
 
-        eps_threshold = 0.05 + (0.9 - 0.05) * math.exp(-1. * step / 1000)
-        if sample > eps_threshold:
-            with torch.no_grad():
-                # t.max(1) will return the largest column value of each row.
-                # second column on max result is index of where max element was
-                # found, so we pick action with the larger expected reward.
-                a: Tensor = self.policy_net(state)
-                r = a.topk(1).indices
-                return r
-        else:
-            # select a random action
-            actions = torch.tensor([1, 2, 3, 4])
-            probabilities = torch.tensor([0.25, 0.25, 0.25, 0.25])
-            probabilities.multinomial(num_samples=1, replacement=False)
-            return actions[probabilities]
+        self.observation = Observation(self.team_id, self.opponent_team_id, initialObservation, actions=np.array([]))
+
+        for unit in self.observation.player.units.values():
+            a = unit.position[0]
+            b = unit.position[1]
+            state = []
+            # center, up, right, down, left
+            for x,y in [(a,b),(a,b-1),(a+1,b),(a,b+1),(a-1,b)]:
+                x = int(x)
+                y = int(y)
+                if x < 0 or y < 0 or x >= self.observation.map.x_max or y >= self.observation.map.y_max\
+                            or ((x,y) in self.observation.map.tiles.keys() and self.observation.map.tiles[x,y].type == TILETYPE.ASTEROID):
+                    state.append(torch.inf)
+                    continue
+                state.append(self.observation.map.tiles[x,y].index)
+            state = torch.tensor(state, dtype=torch.double)
+
+            sample = torch.rand([1])
+
+            eps_threshold = 0.05 + (0.9 - 0.05) * math.exp(-1. * step / 1000)
+            if sample > eps_threshold:
+                with torch.no_grad():
+                    # t.max(1) will return the largest column value of each row.
+                    # second column on max result is index of where max element was
+                    # found, so we pick action with the larger expected reward.
+                    a: Tensor = self.policy_net(state)
+                    direction = a.topk(1).indices.item()
+                    actions[unit.id] = [direction, 0, 0]
+            else:
+                # select a random action
+                action_space = torch.tensor([DIRECTION.CENTER, DIRECTION.UP, DIRECTION.RIGHT, DIRECTION.DOWN, DIRECTION.LEFT])
+                probabilities = torch.tensor([0.2, 0.2, 0.2, 0.2, 0.2])
+                probabilities = probabilities.multinomial(num_samples=1, replacement=False)
+                actions[unit.id] = [action_space[probabilities].item(), 0 , 0]
+
+        return actions
 
     def optimize_model(self):
         if len(self.buffer) < 128:
             return
-        batch = self.buffer.sample(128)
+        batch = self.buffer.sample()
         # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
         # detailed explanation). This converts batch-array of Transitions
         # to Transition of batch-arrays.
