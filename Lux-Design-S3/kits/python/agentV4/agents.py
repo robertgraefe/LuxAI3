@@ -95,22 +95,17 @@ class Agent:
         return actions
 
     def optimize_model(self):
-        if len(self.buffer) < 128:
+        if len(self.buffer) < self.buffer._batch_size:
             return
         batch = self.buffer.sample()
         # Transpose the batch (see https://stackoverflow.com/a/19343/3343043 for
         # detailed explanation). This converts batch-array of Transitions
         # to Transition of batch-arrays.
 
-        states = []
-        actions = []
-        next_states = []
-        rewards = []
-        for state, action, next_state, reward in batch:
-            states.append(state)
-            actions.append(action)
-            next_states.append(next_state)
-            rewards.append(reward)
+        states = batch[0]
+        actions = batch[1]
+        next_states = batch[2]
+        rewards = batch[3]
 
         # Compute a mask of non-final states and concatenate the batch elements
         # (a final state would've been the one after which simulation ended)
@@ -118,14 +113,11 @@ class Agent:
                                                 next_states)), dtype=torch.bool).reshape(-1, 1)
         non_final_next_states = torch.stack([s for s in next_states
                                              if s is not None])
-        state_batch = torch.stack(states)
-        action_batch = torch.as_tensor(actions).reshape(-1, 1)
-        reward_batch = torch.as_tensor(rewards).reshape(-1, 1)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
-        state_action_values = self.policy_net(state_batch).gather(0, action_batch)
+        state_action_values = self.policy_net(states).gather(1, actions.reshape(self.buffer._batch_size,1))
 
         # Compute V(s_{t+1}) for all next states.
         # Expected values of actions for non_final_next_states are computed based
@@ -136,7 +128,7 @@ class Agent:
         with torch.no_grad():
             next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1).values
         # Compute the expected Q values
-        expected_state_action_values = (next_state_values * 0.99) + reward_batch
+        expected_state_action_values = (next_state_values * 0.99) + rewards
 
         # Compute Huber loss
         criterion = nn.SmoothL1Loss()

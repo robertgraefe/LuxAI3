@@ -70,7 +70,7 @@ while not done and not truncation:
 
             reward = manhatten_distance((a,b),(0,0))
 
-            agent_1.buffer.add([state, action, next_state, reward])
+            agent_1.buffer.add([torch.tensor(state, dtype=torch.double), torch.tensor(action[0], dtype=torch.int64), torch.tensor(next_state, dtype=torch.double), torch.tensor(reward, dtype=torch.double)])
 
     agent_1.optimize_model()
 
