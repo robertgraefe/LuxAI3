@@ -19,10 +19,13 @@ class DQN(nn.Module):
         self.layer2 = nn.Linear(128, 128)
         self.layer3 = nn.Linear(128, n_actions)
         self.double()
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.to(device)
 
     # Called with either one element to determine next action, or a batch
     # during optimization. Returns tensor([[left0exp,right0exp]...]).
     def forward(self, x: Tensor):
+        x = x.cuda()
         x = functional.relu(self.layer1(x))
         x = functional.relu(self.layer2(x))
         return self.layer3(x)
@@ -68,7 +71,8 @@ class Agent:
                 y = int(y)
                 if x < 0 or y < 0 or x >= self.observation.map.x_max or y >= self.observation.map.y_max\
                             or ((x,y) in self.observation.map.tiles.keys() and self.observation.map.tiles[x,y].type == TILETYPE.ASTEROID):
-                    state.append(torch.inf)
+                    #state.append(torch.inf)
+                    state.append(999999999999999999999999999999)
                     continue
                 state.append(self.observation.map.tiles[x,y].index)
             state = torch.tensor(state, dtype=torch.double)
@@ -123,7 +127,7 @@ class Agent:
         # on the "older" target_net; selecting their best reward with max(1).values
         # This is merged based on the mask, such that we'll have either the expected
         # state value or 0 in case the state was final.
-        next_state_values = torch.zeros(128, dtype=torch.double).reshape(-1, 1)
+        next_state_values = torch.zeros(128, dtype=torch.double).reshape(-1, 1).cuda()
         with torch.no_grad():
             next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1).values
         # Compute the expected Q values

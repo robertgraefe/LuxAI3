@@ -1,7 +1,7 @@
 import numpy as np
 from luxai_s3.wrappers import LuxAIS3GymEnv, RecordEpisode
-from typing import TypedDict, Any
-from luxai_s3.state import EnvObs, EnvState
+from typing import TypedDict
+from luxai_s3.state import EnvObs
 import jax
 import torch
 # custom
@@ -10,6 +10,10 @@ from agents import Agent
 from environment import TILETYPE, Observation
 from metrics.distance import manhatten_distance
 from visualisation.utils import save_chart
+from actions import DIRECTION
+
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+torch.cuda.set_device(device)
 
 agent_0 = None
 agent_1 = None
@@ -54,7 +58,8 @@ for episode in range(100):
                     if x < 0 or y < 0 or x >= agent_1.observation.map.x_max or y >= agent_1.observation.map.y_max \
                             or ((x, y) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[
                         x, y].type == TILETYPE.ASTEROID):
-                        state.append(torch.inf)
+                        #state.append(torch.inf)
+                        state.append(999999999999999999999999999999)
                         continue
                     state.append(agent_1.observation.map.tiles[x, y].index)
 
@@ -71,15 +76,28 @@ for episode in range(100):
                     if x < 0 or y < 0 or x >= next_observation.map.x_max or y >= next_observation.map.y_max \
                             or ((x, y) in next_observation.map.tiles.keys() and next_observation.map.tiles[
                         x, y].type == TILETYPE.ASTEROID):
-                        next_state.append(torch.inf)
+                        #next_state.append(torch.inf)
+                        next_state.append(999999999999999999999999999999)
                         continue
                     next_state.append(next_observation.map.tiles[x, y].index)
 
                 reward = manhatten_distance((a,b),(0,0)) * -1
 
+                # unit tried to run into asteriod
+                act = action[0]
+                if (act == DIRECTION.UP and (a,b-1) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a,b-1].type == TILETYPE.ASTEROID) or\
+                    (act == DIRECTION.RIGHT and (a+1,b) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a+1,b].type == TILETYPE.ASTEROID) or\
+                    (act == DIRECTION.DOWN and (a,b+1) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a,b+1].type == TILETYPE.ASTEROID) or\
+                    (act == DIRECTION.LEFT and (a-1,b) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a-1,b].type == TILETYPE.ASTEROID):
+                    #reward = -1 * torch.inf
+                    reward = -1 * 999999999999999999999999999999
+
                 unit_rewards.append(reward)
 
-                agent_1.buffer.add([torch.tensor(state, dtype=torch.double), torch.tensor(action[0], dtype=torch.int64), torch.tensor(next_state, dtype=torch.double), torch.tensor(reward, dtype=torch.double)])
+                agent_1.buffer.add([torch.tensor(state, dtype=torch.double, device=device),
+                                    torch.tensor(action[0], dtype=torch.int64, device=device),
+                                    torch.tensor(next_state, dtype=torch.double, device=device),
+                                    torch.tensor(reward, dtype=torch.double, device=device)])
 
             if unit_rewards:
                 reward_history.append(np.average(unit_rewards))
