@@ -4,11 +4,10 @@ import math
 
 from luxai_s3.state import EnvObs
 from torch import nn, Tensor, optim
-from torchrl.data import ReplayBuffer, LazyTensorStorage, ListStorage
+from torchrl.data import ReplayBuffer, ListStorage
 import torch
 
 # custom
-from ReplayBuffer import ReplayMemory
 from environment import EnvironmentConfig, Observation, TILETYPE
 from actions import DIRECTION
 
@@ -117,7 +116,7 @@ class Agent:
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
         # for each batch state according to policy_net
-        state_action_values = self.policy_net(states).gather(1, actions.reshape(self.buffer._batch_size,1))
+        state_action_values = self.policy_net(states).gather(0, actions.reshape(-1,1))
 
         # Compute V(s_{t+1}) for all next states.
         # Expected values of actions for non_final_next_states are computed based
@@ -128,7 +127,7 @@ class Agent:
         with torch.no_grad():
             next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1).values
         # Compute the expected Q values
-        expected_state_action_values = (next_state_values * 0.99) + rewards
+        expected_state_action_values = (next_state_values * 0.99) + rewards.reshape(-1,1)
 
         # Compute Huber loss
         criterion = nn.SmoothL1Loss()

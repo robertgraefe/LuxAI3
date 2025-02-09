@@ -1,3 +1,7 @@
+import numpy as np
+import json
+from matplotlib import pyplot as plt
+
 def plot_training(reward_history):
     # Calculate the Simple Moving Average (SMA) with a window size of 50
     sma = np.convolve(reward_history, np.ones(50) / 50, mode='valid')
