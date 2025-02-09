@@ -59,7 +59,7 @@ for episode in range(100):
                             or ((x, y) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[
                         x, y].type == TILETYPE.ASTEROID):
                         #state.append(torch.inf)
-                        state.append(999999999999999999999999999999)
+                        state.append(9223372036854775807)
                         continue
                     state.append(agent_1.observation.map.tiles[x, y].index)
 
@@ -77,7 +77,7 @@ for episode in range(100):
                             or ((x, y) in next_observation.map.tiles.keys() and next_observation.map.tiles[
                         x, y].type == TILETYPE.ASTEROID):
                         #next_state.append(torch.inf)
-                        next_state.append(999999999999999999999999999999)
+                        next_state.append(9223372036854775807)
                         continue
                     next_state.append(next_observation.map.tiles[x, y].index)
 
@@ -90,7 +90,7 @@ for episode in range(100):
                     (act == DIRECTION.DOWN and (a,b+1) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a,b+1].type == TILETYPE.ASTEROID) or\
                     (act == DIRECTION.LEFT and (a-1,b) in agent_1.observation.map.tiles.keys() and agent_1.observation.map.tiles[a-1,b].type == TILETYPE.ASTEROID):
                     #reward = -1 * torch.inf
-                    reward = -1 * 999999999999999999999999999999
+                    reward = -1 * 9223372036854775807
 
                 unit_rewards.append(reward)
 

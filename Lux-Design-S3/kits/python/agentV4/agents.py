@@ -72,7 +72,7 @@ class Agent:
                 if x < 0 or y < 0 or x >= self.observation.map.x_max or y >= self.observation.map.y_max\
                             or ((x,y) in self.observation.map.tiles.keys() and self.observation.map.tiles[x,y].type == TILETYPE.ASTEROID):
                     #state.append(torch.inf)
-                    state.append(999999999999999999999999999999)
+                    state.append(9223372036854775807)
                     continue
                 state.append(self.observation.map.tiles[x,y].index)
             state = torch.tensor(state, dtype=torch.double)
